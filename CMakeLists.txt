@@ -1,21 +1,39 @@
-if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
-  set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "The vcpkg triplet")
+# CMakeLists.txt
+cmake_minimum_required(VERSION 3.15)
+project(dbf_parquet)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT APPLE)
+    # set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 endif()
 
-cmake_minimum_required(VERSION 3.7)
-project(dbf_parquet)
-
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-
-add_executable(${PROJECT_NAME} src/main.cpp src/dbf.cpp)
-
+# Find dependencies provided by vcpkg (via vcpkg.cmake)
 find_package(Arrow CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE "$<IF:$<BOOL:${ARROW_BUILD_STATIC}>,Arrow::arrow_static,Arrow::arrow_shared>")
-
 find_package(Parquet CONFIG REQUIRED)
+
+set(
+    PROJECT_SOURCES
+    src/main.cpp 
+    src/dbf.cpp
+)
+
+# main target
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+target_link_libraries(${PROJECT_NAME} PRIVATE "$<IF:$<BOOL:${ARROW_BUILD_STATIC}>,Arrow::arrow_static,Arrow::arrow_shared>")
 target_link_libraries(${PROJECT_NAME} PRIVATE "$<IF:$<BOOL:${ARROW_BUILD_STATIC}>,Parquet::parquet_static,Parquet::parquet_shared>")
 
-target_link_libraries(
-    ${PROJECT_NAME} PRIVATE    
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+
+add_custom_target(
+    check-format
+    COMMAND clang-format --dry-run ${PROJECT_SOURCES}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "checking format in src..."
 )
+
+add_custom_target(
+    format
+    COMMAND clang-format -i ${PROJECT_SOURCES}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "checking format in src..."
+)
+
