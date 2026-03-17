@@ -25,10 +25,6 @@ int main(int argc, const char **argv)
 {
 	try
 	{
-		/*
-			string dbfPath = "C:\\workspace\\DBs\\ust\\raw\\WORKS.DBF";
-			string outPath = "C:\\workspace\\DBs\\ust\\raw\\WORKS.parquet";		
-		*/
 		if (argc == 2) {
 			string dbfPath = argv[1];
 			fs::path outPath = dbfPath;
@@ -38,7 +34,7 @@ int main(int argc, const char **argv)
 		}			
 		else
 		{			
-			cout << "Usage: dbfile.exe <dbf file>" << endl;
+			cout << "Usage: dbf-parquet.exe <dbf file>" << endl;
 		}
 	}
 	catch(const exception &e)
