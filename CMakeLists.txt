@@ -1,3 +1,7 @@
+if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+  set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "The vcpkg triplet")
+endif()
+
 cmake_minimum_required(VERSION 3.7)
 project(dbf_parquet)
 
