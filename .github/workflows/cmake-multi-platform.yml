@@ -58,7 +58,12 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libarrow-dev
+        sudo apt install -y -V ca-certificates lsb-release wget
+        wget https://packages.apache.org/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+        sudo apt install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+        sudo apt update
+        sudo apt install -y -V libarrow-dev libparquet-dev # For C++
+        
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
