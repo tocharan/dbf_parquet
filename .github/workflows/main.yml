@@ -1,0 +1,34 @@
+name: C++ Build on Windows with vcpkg
+
+on: [push]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v11
+      with:
+        # Use a vcpkg.json manifest file in your repository root
+        vcpkgManifestPath: ${{ github.workspace }}/vcpkg.json
+        # Automatically cache the built packages across workflow runs
+        # VCPKG_BINARY_SOURCES is automatically set by the action
+        runVcpkgInstall: true 
+
+    - name: Configure CMake
+      run: |
+        cmake -B build
+          # The run-vcpkg action automatically sets VCPKG_ROOT and CMAKE_TOOLCHAIN_FILE
+          # for the subsequent steps in the same job, allowing CMake to find packages.
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Test (Optional)
+      run: |
+        # Replace 'your-test-executable' with the name of your test executable
+        ./build/Release/your-test-executable.exe
