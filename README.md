@@ -2,5 +2,5 @@
 
 ## 
 ```
-dbf-parquet <dbf-file>
+dbf_parquet <dbf-file>
 ```

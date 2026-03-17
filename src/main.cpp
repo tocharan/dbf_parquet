@@ -34,7 +34,7 @@ int main(int argc, const char **argv)
 		}			
 		else
 		{			
-			cout << "Usage: dbf-parquet.exe <dbf file>" << endl;
+			cout << "Usage: dbf_parquet.exe <dbf file>" << endl;
 		}
 	}
 	catch(const exception &e)
