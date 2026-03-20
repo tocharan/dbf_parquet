@@ -25,9 +25,12 @@ jobs:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
+          sudo apt-get install -y ca-certificates lsb-release wget
+          wget https://packages.apache.org/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+          sudo apt install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+          sudo apt update
           sudo apt-get install -y cmake ninja-build pkg-config \
-            libarrow-dev libparquet-dev libboost-all-dev
+            libarrow-dev libparquet-dev
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
@@ -40,15 +43,18 @@ jobs:
         with:
           vcpkgDirectory: ${{ github.workspace }}/vcpkg
           vcpkgArguments: arrow[parquet]
-          vcpkgGitHubLogin: ${{ secrets.VCPKG_GITHUB_LOGIN }}
-          vcpkgGitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          appendedCacheKey: parquet
+          vcpkgGitURL: https://github.com/microsoft/vcpkg
 
       - name: Configure CMake (Linux/macOS)
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux'
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+      - name: Configure CMake (macOS)
+        if: runner.os == 'macOS'
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
-            -DCMAKE_PREFIX_PATH="/usr/local/opt/apache-arrow@${{ matrix.os == 'macOS' && '16' || '14' }}/lib/cmake"
+            -DCMAKE_PREFIX_PATH="$(brew --prefix apache-arrow)/lib/cmake"
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
@@ -67,5 +73,4 @@ jobs:
           path: |
             build/${{ env.BUILD_TYPE }}/dbf_parquet.exe
             build/${{ env.BUILD_TYPE }}/dbf_parquet
-            build/${{ env.BUILD_TYPE }}/dbf_parquet.app/Contents/MacOS/dbf_parquet
           retention-days: 7
