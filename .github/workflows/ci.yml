@@ -42,7 +42,7 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           ./vcpkg/bootstrap-vcpkg.bat
-          ./vcpkg/vcpkg install arrow[parquet]:x64-windows
+          ./vcpkg/vcpkg install arrow[parquet]:x64-windows-static
 
       - name: Configure CMake (Linux/macOS)
         if: runner.os == 'Linux'
@@ -59,7 +59,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
+          cmake -B build -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DARROW_DEPENDENCY_SOURCE=VCPKG -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
       - name: Build
         run: cmake --build build --config ${{ env.BUILD_TYPE }}
